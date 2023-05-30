@@ -1,16 +1,32 @@
-# This is a sample Python script.
+import random
+import telebot
+from telebot import types
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+f = open('facts.txt', 'r', encoding='UTF-8')
+facts = f.read().split('\n')
+f.close()
 
+f = open('thinks.txt', 'r', encoding='UTF-8')
+thinks = f.read().split('\n')
+f.close()
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+bot = telebot.TeleBot("5997345265:AAGIKOgSrFteKik36bXRaRmGhtAG7lpzGq4")
 
+@bot.message_handler(commands=['start'])
+def start(m, res=False):
+    markup =types.ReplyKeyboardMarkup(resize_keyboard=True)
+    item1 = types.KeyboardButton("Факт")
+    item2 = types.KeyboardButton("Поговорка")
+    markup.add(item1)
+    markup.add(item2)
+    bot.send_message(m.chat.id, "Натиснути одну з кнопок", reply_markup=markup)
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+@bot.message_handler(content_types=['text'])
+def handle_text(message):
+    if message.text.strip() == "Факт":
+        answer = random.choice(facts)
+    elif message.text.strip() == "Поговорка":
+        answer = random.choice(thinks)
+    bot.send_message(message.chat.id, answer)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+bot.polling()
